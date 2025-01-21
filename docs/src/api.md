@@ -37,3 +37,9 @@ sinkhorn_unbalanced2
 barycenter_unbalanced
 mm_unbalanced
 ```
+
+## Partial optimal transport
+
+```@docs
+entropic_partial_wasserstein
+```

@@ -306,29 +306,18 @@ Python function.
 # Examples
 
 ```jldoctest sinkhorn_unbalanced
-julia> μ = [0.5, 0.2, 0.3];
+julia> μ = [0.5, 0.5];
 
-julia> ν = [0.0, 1.0];
+julia> ν = [0.5, 0.5];
 
-julia> C = [0.0 1.0; 2.0 0.0; 0.5 1.5];
+julia> C = [0.0 1.0; 1.0 0.0];
 
-julia> round.(sinkhorn_unbalanced(μ, ν, C, 0.01, 1_000); sigdigits=4)
-3×2 Matrix{Float64}:
- 0.0  0.5
- 0.0  0.2002
- 0.0  0.2998
+julia> round.(sinkhorn_unbalanced(μ, ν, C, 1, 1); sigdigits=7)
+2×2 Matrix{Float64}:
+ 0.322054  0.118477
+ 0.118477  0.322054
 ```
 
-It is possible to provide multiple target marginals as columns of a matrix. In this case the
-optimal transport costs are returned:
-
-```jldoctest sinkhorn_unbalanced
-julia> ν = [0.0 0.5; 1.0 0.5];
-
-julia> round.(sinkhorn_unbalanced(μ, ν, C, 0.01, 1_000); sigdigits=4)
-2-element Vector{Float64}:
- 0.9497
- 0.4494
 ```
 
 See also: [`sinkhorn_unbalanced2`](@ref)
@@ -365,25 +354,14 @@ Python function.
 # Examples
 
 ```jldoctest sinkhorn_unbalanced2
-julia> μ = [0.5, 0.2, 0.3];
+julia> μ = [0.5, 0.1];
 
-julia> ν = [0.0, 1.0];
+julia> ν = [0.5, 0.5];
 
-julia> C = [0.0 1.0; 2.0 0.0; 0.5 1.5];
+julia> C = [0.0 1.0; 1.0 0.0];
 
-julia> round.(sinkhorn_unbalanced2(μ, ν, C, 0.01, 1_000); sigdigits=4)
-0.9497
-```
-
-It is possible to provide multiple target marginals as columns of a matrix:
-
-```jldoctest sinkhorn_unbalanced2
-julia> ν = [0.0 0.5; 1.0 0.5];
-
-julia> round.(sinkhorn_unbalanced2(μ, ν, C, 0.01, 1_000); sigdigits=4)
-2-element Vector{Float64}:
- 0.9497
- 0.4494
+julia> round.(sinkhorn_unbalanced2(μ, ν, C, 1., 1.); sigdigits=8)
+0.19600125
 ```
 
 See also: [`sinkhorn_unbalanced`](@ref)
@@ -565,4 +543,46 @@ julia> round.(mm_unbalanced(a, b, M, 5, div="l2"), digits=2)
 """
 function mm_unbalanced(a, b, M, reg_m; kwargs...)
     return pot.unbalanced.mm_unbalanced(a, b, M, reg_m; kwargs...)
+end
+
+
+"""
+    entropic_partial_wasserstein(a, b, M, reg; kwargs...)
+
+Solves the partial optimal transport problem and returns the OT plan
+The function considers the following problem:
+
+```math
+\\gamma = \\mathop{\\arg \\min}_\\gamma \\quad \\langle \\gamma,
+\\mathbf{M} \\rangle_F + \\mathrm{reg} \\cdot\\Omega(\\gamma)
+```
+
+- `a` and `b` are the sample weights
+- `M` is the metric cost matrix
+- `reg` is a regularization term > 0
+
+This function is a wrapper of the function
+[`entropic_partial_wasserstein`](https://pythonot.github.io/gen_modules/ot.partial.html#ot.partial.entropic_partial_wasserstein) in the
+Python Optimal Transport package. Keyword arguments are listed in the documentation of the
+Python function.
+
+
+# Examples
+
+```jldoctest
+julia> a = [.1, .2];
+
+julia> b = [.1, .1];
+
+julia> M = [0. 1.; 2. 3.];
+
+julia> round.(entropic_partial_wasserstein(a, b, M, 1, m=0.1), digits=2)
+2×2 Matrix{Float64}:
+ 0.06  0.02
+ 0.01  0.0
+```
+
+"""
+function entropic_partial_wasserstein(a, b, M, reg; kwargs...)
+    return pot.partial.entropic_partial_wasserstein(a, b, M, reg; kwargs...)
 end
